@@ -32,21 +32,30 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
+	# 安装配置文件
 	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_CONF) ./root/etc/config/blockclient $(1)/etc/config/blockclient
-
+	$(INSTALL_CONF) $(CURDIR)/root/etc/config/blockclient $(1)/etc/config/blockclient
+	
+	# 安装初始化脚本
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./root/etc/init.d/blockclient $(1)/etc/init.d/blockclient
-
+	$(INSTALL_BIN) $(CURDIR)/root/etc/init.d/blockclient $(1)/etc/init.d/blockclient
+	
+	# 安装UCI提交钩子
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) $(CURDIR)/root/etc/uci-defaults/99-blockclient-rules $(1)/etc/uci-defaults/99-blockclient-rules
+	
+	# 安装LuCI组件
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
-	$(INSTALL_DATA) ./root/usr/lib/lua/luci/controller/blockclient.lua $(1)/usr/lib/lua/luci/controller/
-
+	$(INSTALL_DATA) $(CURDIR)/root/usr/lib/lua/luci/controller/blockclient.lua $(1)/usr/lib/lua/luci/controller/
+	
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi
-	$(INSTALL_DATA) ./root/usr/lib/lua/luci/model/cbi/blockclient.lua $(1)/usr/lib/lua/luci/model/cbi/
-
+	$(INSTALL_DATA) $(CURDIR)/root/usr/lib/lua/luci/model/cbi/blockclient.lua $(1)/usr/lib/lua/luci/model/cbi/
+	
+	# 安装ACL权限文件
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
-	$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/blockclient.json $(1)/usr/share/rpcd/acl.d/
-
+	$(INSTALL_DATA) $(CURDIR)/root/usr/share/rpcd/acl.d/blockclient.json $(1)/usr/share/rpcd/acl.d/
+	
+	# 安装国际化文件
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/blockclient.zh-cn.lmo $(1)/usr/lib/lua/luci/i18n/
 endef
