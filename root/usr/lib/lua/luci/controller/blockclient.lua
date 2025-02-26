@@ -1,5 +1,12 @@
 module("luci.controller.blockclient", package.seeall)
 
 function index()
-    entry({"admin", "network", "blockclient"}, cbi("blockclient"), _("Block Clients"), 30)
+    -- 注册到服务菜单
+    entry({"admin", "services", "blockclient"}, 
+        cbi("services/blockclient"),  -- 路径修改为services
+        _("Client Blocking Service"), 
+        60
+    ).dependent = true
+    
+    -- 保留其他回调逻辑...
 end
