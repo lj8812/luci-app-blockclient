@@ -1,0 +1,10 @@
+{
+    "luci-app-blockclient": {
+        "read": {
+            "uci": [ "blockclient" ]
+        },
+        "write": {
+            "uci": [ "blockclient" ]
+        }
+    }
+}
