@@ -1,0 +1,17 @@
+msgid "Block Clients"
+msgstr "禁止客户端上网"
+
+msgid "Client Internet Control"
+msgstr "客户端上网控制"
+
+msgid "Block clients by IP or MAC address"
+msgstr "通过IP或MAC地址禁止客户端上网"
+
+msgid "IP address"
+msgstr "IP地址"
+
+msgid "MAC address"
+msgstr "MAC地址"
+
+msgid "Blocking Rules"
+msgstr "禁止规则"
