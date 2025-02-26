@@ -1,29 +1,50 @@
 #!/bin/sh /etc/rc.common
+# 新增规则清理逻辑和状态检测
 
 START=99
 USE_PROCD=1
+FIREWALL_HOOK=/etc/uci-defaults/99-blockclient-rules
+
+stop_service() {
+    iptables -F BLOCKCLIENT 2>/dev/null
+    iptables -X BLOCKCLIENT 2>/dev/null
+    iptables -D FORWARD -j BLOCKCLIENT 2>/dev/null
+}
+
+apply_rules() {
+    # 防止规则残留
+    iptables -D FORWARD -j BLOCKCLIENT 2>/dev/null
+    iptables -F BLOCKCLIENT 2>/dev/null
+    iptables -X BLOCKCLIENT 2>/dev/null
+    
+    # 创建新规则链
+    iptables -N BLOCKCLIENT 2>/dev/null || {
+        iptables -F BLOCKCLIENT
+        iptables -X BLOCKCLIENT
+        iptables -N BLOCKCLIENT
+    }
+    
+    # 插入主规则链
+    iptables -I FORWARD -j BLOCKCLIENT
+    
+    # 加载当前配置
+    uci -q show blockclient | awk -F= '/=rule$/ {print $1}' | while read section; do
+        ip=$(uci -q get "$section.ip")
+        mac=$(uci -q get "$section.mac")
+        
+        [ -n "$ip" ] && iptables -A BLOCKCLIENT -s "$ip" -j REJECT
+        [ -n "$mac" ] && iptables -A BLOCKCLIENT -m mac --mac-source "$mac" -j REJECT
+    done
+    
+    # 写入防火墙持久化配置
+    [ -d "${FIREWALL_HOOK%/*}" ] || mkdir -p "${FIREWALL_HOOK%/*}"
+    echo "iptables-restore < /etc/firewall.user" > $FIREWALL_HOOK
+}
 
 start_service() {
-    procd_open_instance
-    procd_set_param command /bin/true
-    procd_close_instance
     apply_rules
 }
 
 reload_service() {
     apply_rules
-}
-
-apply_rules() {
-    iptables -F BLOCKCLIENT 2>/dev/null || iptables -N BLOCKCLIENT
-    iptables -D FORWARD -j BLOCKCLIENT 2>/dev/null
-    iptables -I FORWARD -j BLOCKCLIENT
-
-    uci -q show blockclient | awk -F= '/=rule$/ {print $1}' | while read section; do
-        ip=$(uci -q get "$section.ip")
-        mac=$(uci -q get "$section.mac")
-
-        [ -n "$ip" ] && iptables -A BLOCKCLIENT -s "$ip" -j DROP
-        [ -n "$mac" ] && iptables -A BLOCKCLIENT -m mac --mac-source "$mac" -j DROP
-    done
 }
