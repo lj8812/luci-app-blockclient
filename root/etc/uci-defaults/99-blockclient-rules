@@ -1,0 +1,4 @@
+#!/bin/sh
+# 确保防火墙规则持久化
+[ -x /etc/init.d/blockclient ] && /etc/init.d/blockclient reload
+exit 0
