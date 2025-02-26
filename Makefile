@@ -11,7 +11,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/$(PKG_NAME)
   SECTION:=luci
   CATEGORY:=LuCI
-  SUBMENU:=3. Applications
+  SUBMENU:=Services
   TITLE:=LuCI Support for Blocking Clients by IP/MAC
   PKGARCH:=all
   DEPENDS:=+luci-base +iptables
@@ -47,9 +47,10 @@ define Package/$(PKG_NAME)/install
 	# 安装LuCI组件
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DATA) $(CURDIR)/root/usr/lib/lua/luci/controller/blockclient.lua $(1)/usr/lib/lua/luci/controller/
-	
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi
-	$(INSTALL_DATA) $(CURDIR)/root/usr/lib/lua/luci/model/cbi/blockclient.lua $(1)/usr/lib/lua/luci/model/cbi/
+
+	# 服务配置界面
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/services
+	$(INSTALL_DATA) $(CURDIR)/root/usr/lib/lua/luci/model/cbi/services/blockclient.lua $(1)/usr/lib/lua/luci/model/cbi/services/
 	
 	# 安装ACL权限文件
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
