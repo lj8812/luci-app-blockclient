@@ -4,7 +4,7 @@ function index()
     -- 注册到服务菜单
     entry({"admin", "services", "blockclient"}, 
         cbi("services/blockclient"),  -- 路径修改为services
-        _("Client Blocking Service"), 
+        _("Block Clients"), 
         60
     ).dependent = true
     
